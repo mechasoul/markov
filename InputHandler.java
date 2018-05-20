@@ -25,15 +25,15 @@ public class InputHandler {
 	//initial parsing of string to add
 	//takes a string and outputs a list of words, including a specific start-of-line token
 	public List<String> parseLine(String in) {
-    	in = " " + in + " ";//pad to make regex easier b/c im bad (gets removed later anyway)
-    	String processing, finished;
-    	String[] out;
-    	//in order: remove tokens, remove end/start of word | characters (thats our delimiter so we need to remove it), and replace any occurrences of ||+ with |
-    	processing = removeDelimiter2.matcher(removeDelimiter1.matcher(thingsToRemove.matcher(in).replaceAll("")).replaceAll(" ")).replaceAll("\\|");
-    	finished = "<[START]> " + processing;//insert start token
-    	out = finished.split("\\s+");
-    	return Arrays.asList(out);
-    }
+		in = " " + in + " ";//pad to make regex easier b/c im bad (gets removed later anyway)
+		String processing, finished;
+		String[] out;
+		//in order: remove tokens, remove end/start of word | characters (thats our delimiter so we need to remove it), and replace any occurrences of ||+ with |
+		processing = removeDelimiter2.matcher(removeDelimiter1.matcher(thingsToRemove.matcher(in).replaceAll("")).replaceAll(" ")).replaceAll("\\|");
+		finished = "<[START]> " + processing;//insert start token
+		out = finished.split("\\s+");
+		return Arrays.asList(out);
+	}
 	
 	public void processLine(String in) {
 		List<String> parsed = parseLine(in);
