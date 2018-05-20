@@ -76,74 +76,74 @@ public class OutputHandler {
 
 	public String generateLine(Map<Bigram, ArrayList<String>> table, String startWord) {
 		long time1= System.currentTimeMillis();
-    	long time2=0;
-    	int wordCount=0;
-    	String line=" ";
-    	//create starting key from start token and random starting word
-    	Bigram curKey = new Bigram("<[START]>", startWord);
-    	//curKey is the starting phrase
-    	
-    	System.out.println("starting line generation with start word: " + startWord + ", key: " + curKey);
-    	
-    	line+=startWord;
-    	wordCount++;
-    	
-    	//enter loop as long as our phrase is less than 128 words and we haven't hit the end token yet 
-    	//note if we only hit the end token then our string should be empty! which should never happen! i think!
-    	while(wordCount<=128 && !(curKey.getWord2().equals("<[END]>"))) {
-    		//grab the list of following words for the current bigram, and choose a random one
-    		//should never return null i think as long as we've loaded the proper files
-    		//just in case tho
-    		if(!table.containsKey(curKey)) {
-    			return "something went horribly wrong";
-    		//this is what should like always happen
-    		} else {
-    			//list of all following words. get a random one from the list to use as the next word
-    	    	ArrayList<String> curList = table.get(curKey);
-    	    	String nextWord = curList.get(rand.nextInt(curList.size())).intern();
-    	    	//we found a word, so add it to our line and use the two most recent words as our new key
-    	    	line+=" " + nextWord;
-    	    	wordCount++;
-    	    	curKey = new Bigram(curKey.getWord2(), nextWord);
-    	    	//note if we've reached an END token at this point, our curKey.word1 is END and we break the outer loop
-    		}
-    	}
-    	time2 = System.currentTimeMillis();
-    	System.out.println("finished line generation in: " + (time2 - time1) + "ms");
-    	return line;
+		long time2=0;
+		int wordCount=0;
+		String line=" ";
+		//create starting key from start token and random starting word
+		Bigram curKey = new Bigram("<[START]>", startWord);
+		//curKey is the starting phrase
+
+		System.out.println("starting line generation with start word: " + startWord + ", key: " + curKey);
+
+		line+=startWord;
+		wordCount++;
+
+		//enter loop as long as our phrase is less than 128 words and we haven't hit the end token yet 
+		//note if we only hit the end token then our string should be empty! which should never happen! i think!
+		while(wordCount<=128 && !(curKey.getWord2().equals("<[END]>"))) {
+			//grab the list of following words for the current bigram, and choose a random one
+			//should never return null i think as long as we've loaded the proper files
+			//just in case tho
+			if(!table.containsKey(curKey)) {
+				return "something went horribly wrong";
+			//this is what should like always happen
+			} else {
+				//list of all following words. get a random one from the list to use as the next word
+				ArrayList<String> curList = table.get(curKey);
+				String nextWord = curList.get(rand.nextInt(curList.size())).intern();
+				//we found a word, so add it to our line and use the two most recent words as our new key
+				line+=" " + nextWord;
+				wordCount++;
+				curKey = new Bigram(curKey.getWord2(), nextWord);
+				//note if we've reached an END token at this point, our curKey.word1 is END and we break the outer loop
+			}
+		}
+		time2 = System.currentTimeMillis();
+		System.out.println("finished line generation in: " + (time2 - time1) + "ms");
+		return line;
 	}
-	
+
 	//returns a pair of K: most frequently used recent start word, V: its count
 	public Pair<String, Integer> maxRecentStartFrequency(Deque<String> recentStarts) {
 		//temp map that will store a count of each recent start word
 		Map<String, Integer> starts = new ConcurrentHashMap<String, Integer>(20, 0.8f, 2);
 		int maxCount=0;
-    	int currentCount=0;
-    	String maxWord="";
-    	String curWord="";
-    	Iterator<String> it = recentStarts.iterator();
-    	//loop over all elements in deque
-    	while(it.hasNext()) {
-    		curWord = it.next();
-    		//if this word hasn't been seen yet, set its count to 1
-    		if(!starts.containsKey(curWord)) {
-    			currentCount = 1;
-    		//otherwise, increment
-    		} else {
-    			currentCount = starts.get(curWord) + 1;
-    		}
-    		//store the new count
-    		starts.put(curWord, currentCount);
-    		//check if it's greater than our old max count 
-    		//if equal, previous word gets priority. earlier elements were more recently used -> should have priority
-    		if(currentCount > maxCount) {
-    			maxWord = curWord;
-    			maxCount = currentCount;
-    		}
-    	}
-    	
-    	Pair<String, Integer> maxPair = new Pair<String, Integer>(maxWord, maxCount);
-    	return maxPair;
+		int currentCount=0;
+		String maxWord="";
+		String curWord="";
+		Iterator<String> it = recentStarts.iterator();
+		//loop over all elements in deque
+		while(it.hasNext()) {
+			curWord = it.next();
+			//if this word hasn't been seen yet, set its count to 1
+			if(!starts.containsKey(curWord)) {
+				currentCount = 1;
+			//otherwise, increment
+			} else {
+				currentCount = starts.get(curWord) + 1;
+			}
+			//store the new count
+			starts.put(curWord, currentCount);
+			//check if it's greater than our old max count 
+			//if equal, previous word gets priority. earlier elements were more recently used -> should have priority
+			if(currentCount > maxCount) {
+				maxWord = curWord;
+				maxCount = currentCount;
+			}
+		}
+
+		Pair<String, Integer> maxPair = new Pair<String, Integer>(maxWord, maxCount);
+		return maxPair;
 	}
 	
 	public String getRandomStart(Map<String, Integer> starts) {
